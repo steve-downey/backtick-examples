@@ -48,7 +48,8 @@ struct IOMonadImpl {
 
     template <class VALUE>
     auto pure(this auto &&, VALUE &&value) -> IO<std::remove_cvref_t<VALUE>> {
-        return {[value = std::forward<VALUE>(value)](World &) { return value; }};
+        return {
+            [value = std::forward<VALUE>(value)](World &) { return value; }};
     }
 
     template <class A, class F>
@@ -115,8 +116,7 @@ IO<VALUE> pure(VALUE value) {
 template <class A, class B>
 IO<B> then(IO<A> action, IO<B> continuation) {
     return beman::transpose::mbind(
-        std::move(action),
-        [continuation = std::move(continuation)](const A &) {
+        std::move(action), [continuation = std::move(continuation)](const A &) {
             return continuation;
         });
 }

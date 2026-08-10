@@ -82,14 +82,14 @@
 #include <string>
 
 using beman::transpose::mbind;
+using examples::getLine;
 using examples::IO;
 using examples::pure;
+using examples::putStr;
+using examples::putStrLn;
 using examples::then;
 using examples::Unit;
 using examples::World;
-using examples::getLine;
-using examples::putStr;
-using examples::putStrLn;
 
 // d2b6e88f-3a9e-4601-8574-b4ef8561bcf8
 // IO<Unit>, not IO<std::string>: a do block has the type of its last
@@ -105,8 +105,7 @@ IO<Unit> nameReturnAndCarryOn() {
                     auto full = first + " " + last;
                     return then(
                         putStrLn("Pleased to meet you, " + full + "!"),
-                        then(pure(full),
-                             putStrLn("I am not finished yet!")));
+                        then(pure(full), putStrLn("I am not finished yet!")));
                 }));
         }));
 }

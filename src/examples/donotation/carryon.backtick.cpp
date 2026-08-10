@@ -36,14 +36,14 @@
 #include <string>
 
 using beman::transpose::mbind;
+using examples::getLine;
 using examples::IO;
 using examples::pure;
+using examples::putStr;
+using examples::putStrLn;
 using examples::then;
 using examples::Unit;
 using examples::World;
-using examples::getLine;
-using examples::putStr;
-using examples::putStrLn;
 
 // 3c0c7dba-b924-45ce-960f-bab25956a4fc
 // IO<Unit>, not IO<std::string>: a do block has the type of its last
@@ -56,8 +56,7 @@ IO<Unit> nameReturnAndCarryOn() {
                 (getLine() `mbind` [first](std::string last) {
                     auto full = first + " " + last;
                     return putStrLn("Pleased to meet you, " + full + "!") `then`
-                        (pure(full) `then`
-                         putStrLn("I am not finished yet!"));
+                        (pure(full) `then` putStrLn("I am not finished yet!"));
                 });
         });
 }
