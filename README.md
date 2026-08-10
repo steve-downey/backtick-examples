@@ -39,6 +39,7 @@ with `-fno-backtick`, so it is code proven to build with the feature off.
 | `src/examples/senders/chain` | `just`/`then`/`when_all`/`sync_wait` |
 | `src/examples/senders/hop` | `starts_on` and `continues_on`, which the pipe could never spell |
 | `src/examples/senders/scan` | P2300's async inclusive scan, and where the operator stops |
+| `src/examples/donotation/carryon` | a Haskell `do` block, desugared onto beman.transpose's Monad |
 | `src/examples/scorecard` | one compiled instance of each interface shape |
 | `src/examples/consteval` | a pipeline evaluated entirely at compile time, sized from the command line |
 | `src/examples/gating` | proof that nothing here builds without the flag |

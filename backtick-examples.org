@@ -136,6 +136,124 @@ So ~bulk~ keeps its closure and ~pipe~ carries it. That is the honest shape of
 the result: the pipe idiom survives where the arity doesn't fit, and nowhere
 else.
 
+* Do notation, desugared
+
+Haskell had the pipe's problem first -- chained continuations read
+inside-out -- and answered it with syntax. A ~do~ block is sugar over exactly
+two binary operators, and the closing example of the wikibooks chapter that
+teaches this ([[https://en.wikibooks.org/wiki/Haskell/do_notation][Haskell/do notation]]) is built so that every desugaring rule
+fires at least once:
+
+#+begin_src haskell
+nameReturnAndCarryOn = do putStr "What is your first name? "
+                          first <- getLine
+                          putStr "And your last name? "
+                          last <- getLine
+                          let full = first++" "++last
+                          putStrLn ("Pleased to meet you, "++full++"!")
+                          return full
+                          putStrLn "I am not finished yet!"
+#+end_src
+
+The Haskell 2010 report (§3.14) rewrites a ~do~ block one statement at a
+time:
+
+#+begin_src haskell
+do {e}              =  e
+do {e; stmts}       =  e >> do {stmts}
+do {v <- e; stmts}  =  e >>= \v -> do {stmts}   -- v a plain variable, so the
+                                                -- match cannot fail and no
+                                                -- MonadFail case is needed
+do {let ds; stmts}  =  let ds in do {stmts}
+#+end_src
+
+Working down the block, always rewriting the first statement. The ~;~ rule
+peels off the prompt:
+
+#+begin_src haskell
+putStr "What is your first name? " >>
+do first <- getLine
+   ...
+#+end_src
+
+The ~<-~ rule turns the binding into a lambda, which swallows the rest of the
+block -- this is where a later statement gets its right to mention ~first~:
+
+#+begin_src haskell
+putStr "What is your first name? " >>
+(getLine >>= \first ->
+ do putStr "And your last name? "
+    ...)
+#+end_src
+
+The same two rules bind ~last~, and the ~let~ rule is next:
+
+#+begin_src haskell
+... (getLine >>= \last ->
+     let full = first ++ " " ++ last
+     in do putStrLn ("Pleased to meet you, " ++ full ++ "!")
+           return full
+           putStrLn "I am not finished yet!")
+#+end_src
+
+Two more uses of the ~;~ rule and the final ~do {e} = e~, and no sugar
+remains:
+
+#+begin_src haskell
+nameReturnAndCarryOn =
+  putStr "What is your first name? " >>
+  (getLine >>= \first ->
+   putStr "And your last name? " >>
+   (getLine >>= \last ->
+    let full = first ++ " " ++ last
+    in putStrLn ("Pleased to meet you, " ++ full ++ "!") >>
+       (return full >>
+        putStrLn "I am not finished yet!")))
+#+end_src
+
+Note what ~return full~ became: one more statement, sequenced with ~>>~ like
+any other. It neither ends the computation nor sets its result -- the block
+has the type of its /last/ statement, and the extra line still prints.
+
+Everything left standing is Monad. The continuations handed to ~>>=~ use the
+values bound by earlier statements, which is exactly the dependency
+Applicative cannot express, so the translation targets the Monad typeclass
+from [[https://github.com/steve-downey/transpose][beman.transpose]] (P3200's typeclass-object pattern). The pieces map as
+
+| Haskell          | C++                                                  |
+|------------------+------------------------------------------------------|
+| ~IO a~           | ~IO<A>~, a function from the world to an ~A~         |
+| ~m >>= f~        | ~mbind(m, f)~, the typeclass basis                   |
+| ~m >> k~         | ~then(m, k)~, defined as ~m >>= \_ -> k~, its default |
+| ~return x~       | ~pure(x)~ -- C++ has plans for the word ~return~     |
+| ~\v -> e~        | a by-value lambda                                    |
+| ~let v = e in~   | a local variable in the continuation                 |
+
+~IO~ is the teaching model of IO, with the world scripted down to the lines
+the user has yet to type, so the pair is deterministic and the golden can pin
+it:
+
+#+transclude: [[file:src/examples/donotation/io_monad.hpp::5bcec8e5-8043-45e0-8175-a7b0166028f7]] :lines 2- :src c++ :end "5bcec8e5-8043-45e0-8175-a7b0166028f7 end"
+
+The desugared term, translated call for call with the calls spelled prefix,
+nests exactly as Haskell's did:
+
+#+transclude: [[file:src/examples/donotation/carryon.pipe.cpp::d2b6e88f-3a9e-4601-8574-b4ef8561bcf8]] :lines 2- :src c++ :end "d2b6e88f-3a9e-4601-8574-b4ef8561bcf8 end"
+
+And the sugar came off onto two /binary/ operators -- which is what an
+operator is in Haskell, an infix name for a two-argument function -- so under
+this proposal both go back between their arguments:
+
+#+transclude: [[file:src/examples/donotation/carryon.backtick.cpp::3c0c7dba-b924-45ce-960f-bab25956a4fc]] :lines 2- :src c++ :end "3c0c7dba-b924-45ce-960f-bab25956a4fc end"
+
+~pure~ takes one argument and stays a call, the same boundary the scorecard
+draws. The parentheses around each right-hand side are the one piece of
+Haskell that does not carry over: there the trailing lambda extends to the
+end of the expression, while the backtick is left-associative and binds
+tightest, so the grouping is spelled. And the syntax is no coincidence --
+~m `mbind` f~ between its arguments /is/ Haskell's own backtick notation,
+~x `div` y~, come home with the semantics attached.
+
 * What converts, and what does not
 
 The table below is printed by a program that compiles one instance of each
