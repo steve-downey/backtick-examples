@@ -1,7 +1,5 @@
 # Infix Backtick: Worked Examples
 
-[![OpenSSF Baseline](https://www.bestpractices.dev/projects/12577/baseline)](https://www.bestpractices.dev/projects/12577)
-
 Real code from the ranges and senders idioms, rewritten with the infix backtick
 operator, and compiled by the two prototype compilers that implement it.
 
