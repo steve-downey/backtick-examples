@@ -1,0 +1,5 @@
+var searchData=
+[
+  ['test_5fcase_0',['TEST_CASE',['../pipe_8test_8cpp.html#a0779cdbe00c7336cdff76277ca0c04fe',1,'TEST_CASE(&quot;pipe: header is idempotent&quot;):&#160;pipe.test.cpp'],['../pipe_8test_8cpp.html#adc8785448258c3d175318f9322d4dd72',1,'TEST_CASE(&quot;pipe: x `pipe` f is f(x)&quot;):&#160;pipe.test.cpp'],['../pipe_8test_8cpp.html#ac1efa8ac88328da2954578d61bddfc03',1,'TEST_CASE(&quot;pipe: chains left to right&quot;):&#160;pipe.test.cpp'],['../pipe_8test_8cpp.html#af4293f6ad6a6816ef8bf4ff0b518d543',1,'TEST_CASE(&quot;pipe: returns decltype(auto), so identity preserves the reference&quot;):&#160;pipe.test.cpp'],['../pipe_8test_8cpp.html#acb1b0d199adbb4abbcf1ee7db6342284',1,'TEST_CASE(&quot;pipe: carries a niladic range adaptor&quot;):&#160;pipe.test.cpp']]],
+  ['thread_5fcontext_1',['thread_context',['../classexamples_1_1thread__context.html#a25730149d322b2276b044f3adfbcc128',1,'examples::thread_context::thread_context(std::string name)'],['../classexamples_1_1thread__context.html#a939b7f0d4725b25275ab3f27e9a9aeb3',1,'examples::thread_context::thread_context(const thread_context &amp;)=delete']]]
+];
