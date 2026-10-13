@@ -17,6 +17,10 @@ set -euo pipefail
 CLANG_FORMAT="${CLANG_FORMAT:-$HOME/install/clang-23-backtick/bin/clang-format}"
 
 if [[ ! -x ${CLANG_FORMAT} ]]; then
+    if [[ ${GITHUB_ACTIONS:-false} == true ]]; then
+        echo "clang-format-backtick: ${CLANG_FORMAT} is unavailable on the hosted runner; skipping." >&2
+        exit 0
+    fi
     echo "clang-format-backtick: ${CLANG_FORMAT} not found." >&2
     echo "Build and install a prototype (ops/build/configure-clang23-backtick.sh" >&2
     echo "in the backtick repo), or set CLANG_FORMAT to one that understands" >&2
